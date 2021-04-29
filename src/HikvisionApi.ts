@@ -18,8 +18,9 @@ export interface HikVisionNvrApiConfiguration extends PlatformConfig {
 export class HikvisionApi {
   private _http?: AxiosDigest
   private _parser?: Parser
+  private log: any;
 
-  constructor(config: HikVisionNvrApiConfiguration) {
+  constructor(config: HikVisionNvrApiConfiguration, logger: any) {
     const _axios = Axios.create({
       baseURL: `http${config.secure ? 's' : ''}://${config.host}:${config.port}`,
       httpsAgent: new https.Agent({
@@ -28,6 +29,7 @@ export class HikvisionApi {
     });
     this._http = new AxiosDigest(config.username, config.password, _axios);
     this._parser = new Parser({ explicitArray: false })
+    this.log = logger;
   }
 
   /*
@@ -72,6 +74,7 @@ export class HikvisionApi {
 
   async startMonitoringEvents(callback: (value: any) => any) {
 
+    this.log.info("Starting Event monitoring....");
     const xmlParser = new xml2js.Parser({
       explicitArray: false,
     });
@@ -104,10 +107,11 @@ export class HikvisionApi {
       responseType: 'stream',
       headers: {}
     }).then(response => {
+      this.log("Event :", response!.data);
       highland(response!.data)
         .map((chunk: any) => chunk.toString('utf8'))
-        .filter(text => text.match(/<\?xml/))
-        .map(text => text.replace(/[\s\S]*<\?xml/gmi, '<?xml'))
+        //.filter(text => text.match(/<\?xml/))
+        //.map(text => text.replace(/[\s\S]*<\?xml/gmi, '<?xml'))
         .map(xmlText => xmlParser.parseStringPromise(xmlText))
         .each(promise => promise.then(callback));
     });

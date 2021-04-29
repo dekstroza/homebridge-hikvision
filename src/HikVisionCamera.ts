@@ -97,7 +97,7 @@ export class HikVisionCamera {
           accessory.context.username
         }:${accessory.context.password}@${
           accessory.context.host
-        }/ISAPI/Streaming/channels/${channelId}01/picture?videoResolutionWidth=720`,
+        }/ISAPI/ContentMgmt/StreamingProxy/channels/${channelId}01/picture?videoResolutionWidth=720`,
         maxFPS: 30, // TODO: pull this from the camera to avoid ever upsampling
         maxBitrate: 16384, // TODO: pull this from the camera to avoid ever upsampling
         maxWidth: 1920, // TODO: pull this from the camera to avoid ever upsampling

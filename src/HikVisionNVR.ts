@@ -13,7 +13,7 @@ export class HikVisionNVR {
   cameras: HikVisionCamera[];
 
   constructor(logger: any, config: PlatformConfig, api: API) {
-    this.hikVisionApi = new HikvisionApi(config as HikVisionNvrApiConfiguration);
+    this.hikVisionApi = new HikvisionApi(config as HikVisionNvrApiConfiguration, logger);
     this.homebridgeApi = api;
     this.log = logger;
     this.config = config as HikVisionNvrApiConfiguration;
@@ -101,6 +101,7 @@ export class HikVisionNVR {
   }
 
   private processHikVisionEvent(event: any) {
+    this.log.info("Processing HikVision Event", event);
     switch (event.EventNotificationAlert.eventType) {
       case "videoloss":
         this.log.info("videoloss, nothing to do...");
@@ -111,7 +112,7 @@ export class HikVisionNVR {
       case "VMD":
         const motionDetected =
           event.EventNotificationAlert.eventState === "active";
-        const channelId = event.EventNotificationAlert.channelID;
+        const channelId = event.EventNotificationAlert.dynChannelID;
 
         const camera = this.cameras.find(
           (camera) => camera.accessory.context.channelId === channelId
